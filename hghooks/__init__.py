@@ -25,12 +25,9 @@ class Output(object):
 
     output = []
 
-    def append(self,text,type,prepend='\n',as_new_line=True):
+    def append(self,text,type,prepend='\n'):
         text = '%s%s%s%s'%(prepend,getattr(self,type,''),text,self.RESET)
-        if as_new_line:
-            self.output.append(text)
-        else:
-            self.output[len(self.output)] = '%s%s'%(self.output[-1],text)
+        self.output.append(text)
 
     def lines(self,glue='\n',prepend='',append='\n'):
         return '%s%s%s%s'%(prepend,glue.join(self.output),append,self.RESET)
