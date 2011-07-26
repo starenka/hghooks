@@ -16,9 +16,9 @@ def check(ui, repo, hooktype, node, **kwargs):
     files = set()
 
     CHECKS = {
-        'assert False':re.compile(r'^((?!#).)*assert False.*'),
-        'print':re.compile(r'^((?!#).)*print.*'),
-        'IPython shell embedding':re.compile(r'.*IPShellEmbed()().*'),
+        'assert False':re.compile(r'^((?!#)\s)*assert False.*'),
+        'print':re.compile(r'^((?!#)\s)*print.*'),
+        'IPython shell embedding':re.compile(r'^((?!#)\s)*IPShellEmbed()().*'),
     }
 
     for change_id in xrange(repo[node].rev(), len(repo)):
@@ -43,7 +43,7 @@ def check(ui, repo, hooktype, node, **kwargs):
         for file,errs in errors.items():
             out.append('file:\t%s\n%s'%(file,'-'*(len(file)+8)),'HLBOLD')
             for line,check,string in errs:
-                out.append('%s:\t%s%s (%s)'%(line,string,out.RESET,check),'HL',prepend='')
+                out.append('%s\t%s%s (%s)'%(str(line).rjust(4),string,out.RESET,check),'HL',prepend='')
         out.append('If you think this a false-positive feel free to disable hook by using --config:\
             \nhg commit --config "hooks.pretxncommit.monkeycheck="\n','BOLD')
 
