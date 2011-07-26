@@ -11,16 +11,20 @@
 import re
 from hghooks import Output
 
+RE_ASSERT = r'^((?!#)\s)*assert False.*'
+RE_PRINT = r'^((?!#)\s)*print.*'
+RE_IPYTHON = r'^((?!#)\s)*IPShellEmbed\(\)\(\).*'
+
 def check(ui, repo, hooktype, node, **kwargs):
     errors = {}
     files = set()
 
     CHECKS = {
-        'assert False':re.compile(r'^((?!#)\s)*assert False.*'),
-        'print':re.compile(r'^((?!#)\s)*print.*'),
-        'IPython shell embedding':re.compile(r'^((?!#)\s)*IPShellEmbed()().*'),
+        'assert False':re.compile(RE_ASSERT),
+        'print':re.compile(RE_PRINT),
+        'IPython shell embedding':re.compile(RE_IPYTHON),
     }
-
+    
     for change_id in xrange(repo[node].rev(), len(repo)):
         files = [f for f in repo[change_id].files() if f.endswith('.py')]
 
