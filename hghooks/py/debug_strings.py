@@ -52,5 +52,6 @@ def check(ui, repo, hooktype, node, **kwargs):
             \nhg commit --config "hooks.pretxncommit.monkeycheck="\n','BOLD')
 
         ui.warn(out.lines())
-        return True
+        input = ui.promptchoice('Commit anyway? [y/n]',(('&Yes'),('&No')),default=1)
+        return bool(input)
     return False
