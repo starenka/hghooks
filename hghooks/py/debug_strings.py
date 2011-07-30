@@ -17,29 +17,25 @@ RE_IPYTHON = r'^((?!#)\s)*IPShellEmbed\(\)\(\).*'
 
 def check(ui, repo, hooktype, node, **kwargs):
     errors = {}
-    files = set()
+    files = []
 
     CHECKS = {
         'assert False':re.compile(RE_ASSERT),
         'print':re.compile(RE_PRINT),
         'IPython shell embedding':re.compile(RE_IPYTHON),
     }
-    
-    for change_id in xrange(repo[node].rev(), len(repo)):
-        files = [f for f in repo[change_id].files() if f.endswith('.py')]
 
     ctx = repo['tip']
-    for file in files:
-        if file not in ctx: #file is being removed
-            continue
+    to_check = lambda f: f.endswith('py') and f in ctx #if file is not in ctx, it's being removed
+
+    for change_id in xrange(repo[node].rev(), len(repo)):
+        files += [f for f in repo[change_id].files() if to_check(f)]
+
+    for file in set(files):
         """ Maybe this might be quite slow, but I was unable to
             think about other way to track lines too without using grep """
         for i, line in enumerate(ctx[file].data().splitlines()):
-            for check, regexp in CHECKS.items():
-                if re.match(regexp,line):
-                    if file not in errors:
-                        errors[file] = []
-                    errors[file].append((i+1,check,line))
+            errors[file] = [(i+1, check, line) for check in CHECKS if re.match(CHECKS[check], line)]
 
     if errors:
         out = Output()
