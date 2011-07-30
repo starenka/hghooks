@@ -13,6 +13,26 @@
 # You can disable hook(s) by using --config option:
 # hg commit -m 'meh' --config "hooks.pretxncommit.monkeycheck="
 
+import re
+
+def grep_changed_files(repo,node,ext,checks):
+    errors = {}
+    files = []
+
+    ctx = repo['tip']
+    to_check = lambda f: f.endswith('.%s'%ext) and f in ctx #if file is not in ctx, it's being removed
+
+    for change_id in xrange(repo[node].rev(), len(repo)):
+        files += [f for f in repo[change_id].files() if to_check(f)]
+
+    for file in set(files):
+        """ Maybe this might be quite slow, but I was unable to
+            think about other way to track lines too without using grep """
+        for i, line in enumerate(ctx[file].data().splitlines()):
+            errors[file] = [(i+1, check, line) for check in checks if re.match(checks[check], line)]
+
+    return errors
+
 class Output(object):
 
     #bash colours
@@ -25,7 +45,7 @@ class Output(object):
 
     output = []
 
-    def append(self,text,type,prepend='\n'):
+    def append(self,text,type='',prepend='\n'):
         text = '%s%s%s%s'%(prepend,getattr(self,type,''),text,self.RESET)
         self.output.append(text)
 
