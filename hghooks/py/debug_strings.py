@@ -11,18 +11,12 @@
 import re
 from hghooks import Output, grep_changed_files
 
-RE_ASSERT = r'^((?!#)\s)*assert False.*'
-RE_PRINT = r'^((?!#)\s)*print.*'
-RE_IPYTHON = r'^((?!#)\s)*IPShellEmbed\(\)\(\).*'
+RE_ASSERT = 'assert False',re.compile(r'^((?!#)\s)*assert False.*')
+RE_PRINT = 'print',re.compile(r'^((?!#)\s)*print.*')
+RE_IPYTHON = 'IPython shell embedding',re.compile(r'^((?!#)\s)*IPShellEmbed\(\)\(\).*')
 
 def check(ui, repo, hooktype, node, **kwargs):
-    checks = {
-        'assert False':re.compile(RE_ASSERT),
-        'print':re.compile(RE_PRINT),
-        'IPython shell embedding':re.compile(RE_IPYTHON),
-    }
-
-    errors = grep_changed_files(repo,node,ext='py',checks=checks)
+    errors = grep_changed_files(repo,node,ext='py',checks=(RE_ASSERT,RE_PRINT,RE_IPYTHON))
 
     if errors:
         out = Output()

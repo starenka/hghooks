@@ -48,7 +48,7 @@ class DebugStrings(unittest2.TestCase):
         }
 
         for regexp,tests in map.items():
-            rc = re.compile(getattr(sys.modules[__name__],regexp.upper()))
+            rc = getattr(sys.modules[__name__],regexp.upper())[1]
             for t in tests:
                 #print rc, t[0], t[1]
                 self.assertEqual(t[0],bool(re.match(rc,t[1])))
