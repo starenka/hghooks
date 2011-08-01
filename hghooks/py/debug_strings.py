@@ -18,7 +18,7 @@ RE_IPYTHON = 'IPython shell embedding',re.compile(r'^((?!#)\s)*IPShellEmbed\(\)\
 def check(ui, repo, hooktype, node, **kwargs):
     errors = grep_changed_files(repo,node,ext='py',checks=(RE_ASSERT,RE_PRINT,RE_IPYTHON))
 
-    if errors:
+    if any(errors.values()):
         out = Output()
         out.append("You maybe didn't want to commit this, did you?..",'ERR')
         for file,errs in errors.items():
