@@ -29,7 +29,11 @@ def grep_changed_files(repo,node,ext,checks):
         """ Maybe this might be quite slow, but I was unable to
             think about other way to track lines too without using grep """
         for i, line in enumerate(ctx[file].data().splitlines()):
-            errors[file] = [(i+1, check[0], line) for check in checks if re.match(check[1], line)]
+            for check, regexp in checks:
+                if re.match(regexp,line):
+                    if file not in errors:
+                        errors[file] = []
+                    errors[file].append((i+1,check,line))
 
     return errors
 
