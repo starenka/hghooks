@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re, unittest2, sys
+import re, unittest, sys
 
-from hghooks.py.debug_strings import RE_ASSERT, RE_PRINT, RE_IPYTHON
+from hghooks.py.debug_strings import RE_ASSERT, RE_PRINT, RE_IPYTHON, RE_PPRINT
 
-class DebugStrings(unittest2.TestCase):
+class DebugStrings(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -33,6 +33,19 @@ class DebugStrings(unittest2.TestCase):
                     (True,'     print money'),
                     (True,'     print    '),
             ],
+            're_pprint':[
+                    (False,'#pprint.print("fap")'),
+                    (False,'#  print 2'),
+                    (False,'   #pprint(obj)'),
+                    (False,'#import pprint;pprint.pprint(bill)  '),
+                    (False,'ur mama is so fat you can #pprint her on billboards  '),
+                    (False,'prettypprint  '),
+                    (True,'pprint('),
+                    (True,'pprint.pprint(one)'),
+                    (True,'import pprint; pprint.pprint(one)'),
+                    (True,'     pprint(money'),
+                    (True,'     pprint.pprint()    '),
+            ],
             're_ipython':[
                     (False,'#IPShellEmbed()()'),
                     (False,'#  IPShellEmbed()()'),
@@ -51,7 +64,7 @@ class DebugStrings(unittest2.TestCase):
             rc = getattr(sys.modules[__name__],regexp.upper())[1]
             for t in tests:
                 #print rc, t[0], t[1]
-                self.assertEqual(t[0],bool(re.match(rc,t[1])))
+                self.assertEqual(t[0],bool(re.match(rc,t[1])), t)
 
 if __name__ == '__main__':
-    unittest2.main()
+    unittest.main()
